@@ -1,35 +1,93 @@
 #include <Arduino.h>
-int valor = 0;
-int pin51 = 4;
-int pin52 = 5;
+#include <LiquidCrystal_I2C.h>
 
-bool estadoatual51 = false;
-bool estadoatual52 = false;
-bool estadoanterior51 = false;
-bool estadoanterior52 = false;
-void setup()
-{
-  pinMode(pin51, INPUT);
-  pinMode(pin52, INPUT);
-  Serial.begin(9600);
+byte  led[8] = {
+	0b10001,
+	0b00100,
+	0b01010,
+	0b10001,
+	0b01010,
+	0b00100,
+	0b10001,
+	0b00000
+};byte led2[8] = {
+	0b10001,
+	0b00100,
+	0b01110,
+	0b11011,
+	0b01110,
+	0b00100,
+	0b10001,
+	0b00000
+};byte led3[8] = {
+	0b10001,
+	0b00100,
+	0b01110,
+	0b11111,
+	0b01110,
+	0b00100,
+	0b10001,
+	0b00000
+};byte select[8] = {
+	0b00000,
+	0b00000,
+	0b00100,
+	0b01000,
+	0b11111,
+	0b01000,
+	0b00100,
+	0b00000
+};
+
+LiquidCrystal_I2C lcd(0x27, 20, 4);
+
+#define botao 2
+#define entradaA 5
+#define entradaB 23
+
+const int8_t tabelaTransicao[4][4] = {
+// +1 horario 
+// 0 parado 
+// - 1 antihorario
+
+// 0   1  2  3 ATUAL
+  {0, 1, -1, 0}, // 0 anterior
+  {-1, 0, 0, 1}, // 1 anterior
+  {1, 0, 0, -1}, // 2 anterior
+  {0, -1, 1, 0} // 3 anterior
+  };
+
+//* 32013201 HORARIO 
+//* 10231023 ANTIHORARIO
+
+void setup() {
+  
+  pinMode(entradaA, INPUT);
+  pinMode(entradaB, INPUT);
+  pinMode(botao, INPUT);
+
+  Serial.begin(115200);
+
+  lcd.init();
+  lcd.backlight();
+
 }
 
-void loop()
-{
-  estadoatual51 = digitalRead(pin51);
-  estadoatual52 = digitalRead(pin52);
+void loop() {
+  
+  bool leituraEntradaA = digitalRead(entradaA);
+  bool leituraEntradaB = digitalRead(entradaB);
+  int estadoAtualEncoder = ((leituraEntradaA << 1) | leituraEntradaB);
+  static int estadoAnteriorEncoder = 3;
 
-  if (estadoatual51 != estadoanterior51 || estadoatual52 != estadoanterior52)
-  {
-    estadoanterior51 = estadoatual51;
-    estadoanterior52 = estadoatual52;
+  static int posicao = 0;
 
-    Serial.print(estadoatual51);
-    Serial.print(" ");
-    Serial.println(estadoatual52);
-    if (estadoatual51 && estadoatual52)
-    {
-      Serial.println("_____________________");
-    }
-  }
+  posicao = posicao + tabelaTransicao[estadoAnteriorEncoder][estadoAtualEncoder];
+
+  Serial.println(posicao/4);
+  lcd.print(posicao/4);
+
+
+
+  estadoAnteriorEncoder = estadoAtualEncoder;
 }
