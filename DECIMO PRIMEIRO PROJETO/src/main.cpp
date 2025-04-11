@@ -3,6 +3,7 @@
 
 BluetoothSerial SerialBT;
 
+String led = "";
 void setup()
 {
   Serial.begin(9600);
@@ -13,9 +14,56 @@ void setup()
 
 void loop()
 {
-  if (SerialBT.available()) //identifica se algo nao foi lido
+
+  static int intensidadeLed[4] = {0, 0, 0, 0};
+  static int ledselecionado = 0;
+  if (SerialBT.available()) // identifica se algo nao foi lido
   {
-    
-  char led = SerialBT.read();
-}
+
+    char leitura = SerialBT.read();
+    if (leitura == '\n')
+    {
+      SerialBT.println(led);
+      if (led.equals("led A"))
+      {
+        ledselecionado = 1;
+        if (intensidadeLed[ledselecionado] > 100)
+          intensidadeLed[ledselecionado] = 100;
+        else if (intensidadeLed[ledselecionado] < 0)
+          intensidadeLed[ledselecionado] = 0;
+
+        SerialBT.println("O led A esta ligado");
+      }
+      else if (led.equals("led B"))
+      {
+        ledselecionado = 2;
+        if (intensidadeLed[ledselecionado] > 100)
+          intensidadeLed[ledselecionado] = 100;
+        else if (intensidadeLed[ledselecionado] < 0)
+          intensidadeLed[ledselecionado] = 0;
+
+        SerialBT.println("O led B esta ligado");
+      }
+      else if (led.equals("led C"))
+      {
+        ledselecionado = 3;
+        if (intensidadeLed[ledselecionado] > 100)
+          intensidadeLed[ledselecionado] = 100;
+        else if (intensidadeLed[ledselecionado] < 0)
+          intensidadeLed[ledselecionado] = 0;
+
+        SerialBT.println("O led C esta ligado");
+      }
+      else if (led.equals("led D"))
+      {
+        ledselecionado = 4;
+        if (intensidadeLed[ledselecionado] > 100)
+          intensidadeLed[ledselecionado] = 100;
+        else if (intensidadeLed[ledselecionado] < 0)
+          intensidadeLed[ledselecionado] = 0;
+
+        SerialBT.println("O led D esta ligado");
+      }
+    }
+  }
 }

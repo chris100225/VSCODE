@@ -2,17 +2,6 @@
 #include "BluetoothSerial.h"
 #define pinled 2
 String palavra = "";
-
-
-
-
-
-
-
-
-
-
-
 BluetoothSerial SerialBT;
 
 void setup()
@@ -26,7 +15,7 @@ void setup()
 
 void loop()
 {
-  if (SerialBT.available())
+  if (SerialBT.available()) //identifica se algo nao foi lido
   {
     
 char caractere = SerialBT.read();
